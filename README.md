@@ -2,7 +2,8 @@
 To automate deployment of Azure Logic Apps, this PowerShell script helps to create an Azure Resource Manager (ARM) template.
 
 # How to use
-1. Download the Tool
+1. Download the Tool  
+   [![Download](./images/Download.png)](https://aka.ms/LogicAppARMGenerator)
 
 2. Open a Powershell session / Visual Studio Code
 
