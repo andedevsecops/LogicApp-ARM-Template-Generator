@@ -9,10 +9,10 @@ To automate deployment of Azure Logic Apps, this PowerShell script helps to crea
 
 3. Run the script using the following command  
    ```  
-   .\GenerateARMTemplate.ps1 -LogicApp LogicAppName `
-                        -ResourceGroup LogicAppResourceGroup `
-                        -SubscriptionId MySubscriptionId `
-                        -TenantName MyTenantName `
+   .\GenerateARMTemplate.ps1 -LogicAppName LogicAppName `
+                        -LogicAppResourceGroup LogicAppResourceGroup `
+                        -MySubscriptionId MySubscriptionId `
+                        -MyTenantName MyTenantName `
                         
    ```
 
