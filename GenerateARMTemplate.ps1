@@ -24,10 +24,16 @@
 
 #region UserInputs
 param(
-    [parameter(Mandatory = $true, HelpMessage = "Enter the resource group location for the Log Analytics workspace.")]
+    [parameter(Mandatory = $true, HelpMessage = "Enter the Tenant Name")]
+    [string]$MyTenantName,
+
+    [parameter(Mandatory = $true, HelpMessage = "Enter the Subscription Id")]
+    [string]$MySubscriptionId,
+
+    [parameter(Mandatory = $true, HelpMessage = "Enter the LogicApp Resource Group")]
     [string]$LogicAppResourceGroup,
 
-    [parameter(Mandatory = $true, HelpMessage = "Enter the Log Analytics workspace name from which to export data.")]
+    [parameter(Mandatory = $true, HelpMessage = "Enter the LogicApp Name")]
     [string]$LogicAppName    
 )
 #endregion UserInputs
@@ -99,13 +105,13 @@ function Get-RequiredModules {
                 Write-Log -Message "Can not install the $Module module. You are not running as Administrator" -LogFileName $LogFileName -Severity Warning
                 Write-Log -Message "Installing $Module module to current user Scope" -LogFileName $LogFileName -Severity Warning
                 
-                Install-Module -Name $Module -Scope CurrentUser -Force
+                Install-Module -Name $Module -Scope CurrentUser -Force -AllowClobber
                 Import-Module -Name $Module -Force
             }
             else {
                 #Admin, install to all users																		   
                 Write-Log -Message "Installing the $Module module to all users" -LogFileName $LogFileName -Severity Warning
-                Install-Module -Name $Module -Force -ErrorAction continue
+                Install-Module -Name $Module -Force -AllowClobber -ErrorAction continue
                 Import-Module -Name $Module -Force -ErrorAction continue
             }
         }
@@ -146,11 +152,14 @@ $SubscriptionId = $Context.Subscription.Id
 $AzureAccessToken = (Get-AzAccessToken).Token
 
 try {
-	Get-LogicAppTemplate -LogicApp $LogicAppName -ResourceGroup $LogicAppResourceGroup -SubscriptionId $SubscriptionId -Token $AzureAccessToken -DisabledState $true -Verbose | Out-File "$PSScriptRoot\$LogicAppName.json"
+	Get-LogicAppTemplate -LogicApp $LogicAppName `
+                        -ResourceGroup $LogicAppResourceGroup `
+                        -SubscriptionId $MySubscriptionId `
+                        -TenantName $MyTenantName `
+                        -Token $AzureAccessToken `
+                        -DisabledState $true -Verbose | Out-File "$PSScriptRoot\$LogicAppName.json"
 }
 catch {
-	Write-Log -Message "An error occurred in generating ARM Template" -LogFileName $LogFileName -Severity Error        
+	Write-Log -Message "An error occurred in generating ARM Template :$($_.ErrorDetails.Message | ConvertFrom-Json | Select-Object -Expand message)" -LogFileName $LogFileName -Severity Error        
 }
-
-
 #endregion
