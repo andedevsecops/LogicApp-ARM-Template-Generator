@@ -157,7 +157,7 @@ try {
                         -SubscriptionId $MySubscriptionId `
                         -TenantName $MyTenantName `
                         -Token $AzureAccessToken `
-                        -DisabledState $true -Verbose | Out-File "$PSScriptRoot\$LogicAppName.json"
+                        -DisabledState -Verbose | Out-File "$PSScriptRoot\$LogicAppName.json"
 }
 catch {
 	Write-Log -Message "An error occurred in generating ARM Template :$($_.ErrorDetails.Message | ConvertFrom-Json | Select-Object -Expand message)" -LogFileName $LogFileName -Severity Error        
