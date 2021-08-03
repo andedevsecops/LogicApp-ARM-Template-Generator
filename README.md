@@ -8,7 +8,13 @@ To automate deployment of Azure Logic Apps, this PowerShell script helps to crea
 2. Open a Powershell session / Visual Studio Code
 
 3. Run the script using the following command  
-   ```.\GenerateARMTemplate.ps1 -LogicAppResourceGroup logicapp-resgrp1 -LogicAppName logicappname```
+   ```  
+   .\GenerateARMTemplate.ps1 -LogicApp LogicAppName `
+                        -ResourceGroup LogicAppResourceGroup `
+                        -SubscriptionId MySubscriptionId `
+                        -TenantName MyTenantName `
+                        
+   ```
 
 # Questions ❓ / Issues 🙋‍♂️ / Feedback 🗨
 Post [here](https://github.com/andedevsecops/LogicApp-ARM-Template-Generator/issues).
