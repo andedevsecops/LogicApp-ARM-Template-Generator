@@ -11,6 +11,12 @@
     .DESCRIPTION
         Generates Azure Resource Manager (ARM) Template for Logic App	
     
+    .PARAMETER MyTenantName
+        Enter the Tenant name (required)
+    
+    .PARAMETER MySubscriptionId
+        Enter the Azure Subscription Id (required) 
+
     .PARAMETER LogicAppName
         Enter the LogicApp name (required)
     
@@ -18,11 +24,15 @@
         Enter the Resource Group name of LogicApp (required)    
 
     .EXAMPLE
-        .\GenerateARMTemplate.ps1 -LogicAppResourceGroup logicapp-resgrp1 -LogicAppName logicappname
+        .\GenerateARMTemplate.ps1 -LogicAppName LogicAppName `
+                     -LogicAppResourceGroup LogicAppResourceGroup `
+                     -MySubscriptionId MySubscriptionId `
+                     -MyTenantName MyTenantName
         
 #>
 
 #region UserInputs
+
 param(
     [parameter(Mandatory = $true, HelpMessage = "Enter the Tenant Name")]
     [string]$MyTenantName,
@@ -75,7 +85,7 @@ function Write-Log {
         } | Export-Csv -Path "$PSScriptRoot\$LogFileName" -Append -NoTypeInformation -Force
     }
     catch {
-        Write-Error "An error occurred in Write-Log() method" -ErrorAction SilentlyContinue		
+        Write-Error "An error occurred in Write-Log() method: $($_ | Out-String)" -ErrorAction SilentlyContinue		
     }    
 }
 
@@ -115,11 +125,14 @@ function Get-RequiredModules {
                 Import-Module -Name $Module -Force -ErrorAction continue
             }
         }
+        else {
+            Update-Module -Name $Module
+        }        
         # Install-Module will obtain the module from the gallery and install it on your local machine, making it available for use.
         # Import-Module will bring the module and its functions into your current powershell session, if the module is installed.  
     }
-    catch {
-        Write-Log -Message "An error occurred in Get-RequiredModules() method" -LogFileName $LogFileName -Severity Error																			
+    catch {        
+        Write-Log -Message "An error occurred in Get-RequiredModules() method : $($_ | Out-String)" -LogFileName $LogFileName -Severity Error        
         exit
     }
 }
@@ -139,7 +152,7 @@ $TimeStamp = Get-Date -Format yyyyMMdd_HHmmss
 $LogFileName = '{0}_{1}.csv' -f "LogicAppTemplate", $TimeStamp
 
 Write-Host "`n`n`r`If not already authenticated, you will be prompted to sign in to Azure." -BackgroundColor Blue
-Read-Host -Prompt "Press enter to continue or CTRL+C to exit the script."
+Read-Host -Prompt "Press enter to continue or CTRL+C to exit the script"
 
 $Context = Get-AzContext
 
@@ -148,7 +161,6 @@ if (!$Context) {
     $Context = Get-AzContext
 }
 
-$SubscriptionId = $Context.Subscription.Id
 $AzureAccessToken = (Get-AzAccessToken).Token
 
 try {
@@ -158,8 +170,10 @@ try {
                         -TenantName $MyTenantName `
                         -Token $AzureAccessToken `
                         -DisabledState -Verbose | Out-File "$PSScriptRoot\$LogicAppName.json"
+    
+    Write-Log -Message "LogicApp:$LogicAppName ARM Template successfully generated, please copy from $PSScriptRoot with file name $LogicAppName.json" -LogFileName $LogFileName -Severity Information
 }
-catch {
-	Write-Log -Message "An error occurred in generating ARM Template :$($_.ErrorDetails.Message | ConvertFrom-Json | Select-Object -Expand message)" -LogFileName $LogFileName -Severity Error        
+catch {    
+	Write-Log -Message "An error occurred in generating ARM Template : $($_ | Out-String)" -LogFileName $LogFileName -Severity Error        
 }
 #endregion
