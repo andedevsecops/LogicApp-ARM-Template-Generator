@@ -1,3 +1,6 @@
+
+## UPDATE : V2.0 Playbook ARM Template Generator has been pushed to Azure Sentinel GitHub Repo - https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator
+
 # LogicApp-ARM-Template-Generator
 To automate deployment of Azure Logic Apps, this PowerShell script helps to create an Azure Resource Manager (ARM) template.
 
